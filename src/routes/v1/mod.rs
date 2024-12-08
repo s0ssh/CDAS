@@ -1,3 +1,5 @@
+pub mod platforms;
+
 use rocket::http::Status;
 
 #[get("/status")]

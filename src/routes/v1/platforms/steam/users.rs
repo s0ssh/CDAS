@@ -24,7 +24,15 @@ pub async fn get_users_list(page: Option<usize>, per_page: Option<usize>) -> (St
 
 #[get("/<steam_id>")]
 pub async fn get_users_by_id(steam_id: u64) -> (Status, Value) {
-    todo!()
+    match DB
+        .lock()
+        .await
+        .query_table_platform_steam_users_by_id(steam_id)
+        .await
+    {
+        Ok(result) => (Status::Ok, json!(result)),
+        Err(_) => (Status::InternalServerError, json!([])),
+    }
 }
 
 #[get("/count")]

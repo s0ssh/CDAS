@@ -81,4 +81,25 @@ impl PgDb {
 
         Ok(users)
     }
+
+    pub async fn query_table_platform_steam_users_by_id(
+        &self,
+        steam_id: u64,
+    ) -> Result<Vec<(u64, String)>, Box<dyn Error>> {
+        let users: Vec<(u64, String)> = sqlx::query_as(&format!(
+            "SELECT user_steam_id, user_ip_addr FROM PlatformSteamUsers WHERE user_steam_id = {};",
+            steam_id
+        ))
+        .fetch_all(
+            self.pool
+                .as_ref()
+                .expect("Failed to execute query: pool is not initialized"),
+        )
+        .await?
+        .iter()
+        .map(|(id, ip): &(i64, String)| (*id as u64, ip.to_owned()))
+        .collect::<Vec<(u64, String)>>();
+
+        Ok(users)
+    }
 }

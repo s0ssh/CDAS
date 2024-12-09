@@ -1,7 +1,6 @@
 use sqlx::{
-    Row,
     postgres::{PgPoolOptions, PgQueryResult},
-    PgPool,
+    PgPool, Row,
 };
 use std::env;
 use std::error::Error;
@@ -38,31 +37,48 @@ impl PgDb {
         Ok(())
     }
 
-    pub async fn init_table_platform_steam_users(&self) -> Result<PgQueryResult, sqlx::Error> {
+    pub async fn init_table_platform_steam_users(&self) -> Result<PgQueryResult, Box<dyn Error>> {
         Ok(sqlx::query(
             "
                 CREATE TABLE IF NOT EXISTS PlatformSteamUsers
                 (
                     id SERIAL PRIMARY KEY,
                     user_steam_id BIGINT NOT NULL,
-                    ip_punished VARCHAR(15) NOT NULL
+                    user_ip_addr VARCHAR(15) NOT NULL
                 );",
         )
         .execute(
             self.pool
                 .as_ref()
-                .expect("Failed to initialize PlatformSteam table - pool is not initialized"),
+                .expect("Failed to execute query: pool is not initialized"),
         )
         .await?)
     }
 
-    pub async fn query_table_platform_steam_users_count(&self) -> Result<i64, sqlx::Error> {
-        Ok(
-            sqlx::query("SELECT COUNT(id) FROM PlatformSteamUsers;")
-                .fetch_one(self.pool.as_ref().expect("Failed to initialize PlatformSteam table - pool is not initialized"))
+    pub async fn query_table_platform_steam_users_count(&self) -> Result<i64, Box<dyn Error>> {
+        Ok(sqlx::query("SELECT COUNT(id) FROM PlatformSteamUsers;")
+            .fetch_one(
+                self.pool
+                    .as_ref()
+                    .expect("Failed to execute query: pool is not initialized"),
+            )
+            .await?
+            .get(0))
+    }
+
+    pub async fn query_table_platform_steam_users_list(
+        &self,
+        page: usize,
+        per_page: usize,
+    ) -> Result<Vec<(u64, String)>, Box<dyn Error>> {
+        let users: Vec<(u64, String)> =
+            sqlx::query_as(&format!("SELECT user_steam_id, user_ip_addr FROM PlatformSteamUsers ORDER BY id DESC LIMIT {} OFFSET {};", per_page, page * per_page))
+                .fetch_all(self.pool.as_ref().expect("Failed to execute query: pool is not initialized"))
                 .await?
-                .get(0)
-        )
+                .iter()
+                .map(|(id, ip): &(i64, String)| (*id as u64, ip.to_owned()))
+                .collect::<Vec<(u64, String)>>();
+
+        Ok(users)
     }
 }
-

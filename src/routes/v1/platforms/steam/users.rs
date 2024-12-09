@@ -1,3 +1,5 @@
+use crate::DB;
+
 use rocket::http::Status;
 use rocket::serde::{
     json::{json, Json, Value},
@@ -20,8 +22,10 @@ pub async fn get_users_by_id(steam_id: u64) -> (Status, Value) {
 
 #[get("/count")]
 pub async fn get_users_count() -> (Status, Value) {
-
-    todo!()
+    match DB.lock().await.query_table_platform_steam_users_count().await {
+        Ok(result) => (Status::Ok, json!({"count": result})),
+        Err(_) => (Status::InternalServerError, json!({})),
+    }
 }
 
 // TODO! add insert entry endpoint

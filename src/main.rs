@@ -24,9 +24,9 @@ async fn rocket() -> _ {
 
     DB.lock()
         .await
-        .init_table_platform_steam()
+        .init_table_platform_steam_users()
         .await
-        .expect("Failed to init PlatformSteam table");
+        .expect("Failed to init PlatformSteamUsers table");
 
 
     rocket::build()

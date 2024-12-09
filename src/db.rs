@@ -1,4 +1,5 @@
 use sqlx::{
+    Row,
     postgres::{PgPoolOptions, PgQueryResult},
     PgPool,
 };
@@ -37,10 +38,10 @@ impl PgDb {
         Ok(())
     }
 
-    pub async fn init_table_platform_steam(&self) -> Result<PgQueryResult, sqlx::Error> {
+    pub async fn init_table_platform_steam_users(&self) -> Result<PgQueryResult, sqlx::Error> {
         Ok(sqlx::query(
             "
-                CREATE TABLE IF NOT EXISTS PlatformSteam
+                CREATE TABLE IF NOT EXISTS PlatformSteamUsers
                 (
                     id SERIAL PRIMARY KEY,
                     user_steam_id BIGINT NOT NULL,
@@ -53,6 +54,15 @@ impl PgDb {
                 .expect("Failed to initialize PlatformSteam table - pool is not initialized"),
         )
         .await?)
+    }
+
+    pub async fn query_table_platform_steam_users_count(&self) -> Result<i64, sqlx::Error> {
+        Ok(
+            sqlx::query("SELECT COUNT(id) FROM PlatformSteamUsers;")
+                .fetch_one(self.pool.as_ref().expect("Failed to initialize PlatformSteam table - pool is not initialized"))
+                .await?
+                .get(0)
+        )
     }
 }
 

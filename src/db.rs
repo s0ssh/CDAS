@@ -43,8 +43,8 @@ impl PgDb {
                 CREATE TABLE IF NOT EXISTS PlatformSteamUsers
                 (
                     id SERIAL PRIMARY KEY,
-                    user_steam_id BIGINT NOT NULL,
-                    user_ip_addr VARCHAR(15) NOT NULL
+                    user_steam_id BIGINT NOT NULL CHECK (user_steam_id > 0),
+                    user_ip_addr VARCHAR(15) NOT NULL CHECK (user_steam_id < 100000000000000000)
                 );",
         )
         .execute(
@@ -87,7 +87,7 @@ impl PgDb {
         steam_id: u64,
     ) -> Result<Vec<(u64, String)>, Box<dyn Error>> {
         let users: Vec<(u64, String)> = sqlx::query_as(&format!(
-            "SELECT user_steam_id, user_ip_addr FROM PlatformSteamUsers WHERE user_steam_id = {};",
+            "SELECT user_steam_id, user_ip_addr FROM PlatformSteamUsers WHERE user_steam_id = {} LIMIT 1000;",
             steam_id
         ))
         .fetch_all(

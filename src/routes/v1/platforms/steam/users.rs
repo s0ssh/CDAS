@@ -7,14 +7,14 @@ use rocket::serde::{
 };
 
 #[get("/list?<page>&<per_page>")]
-pub async fn get_users_list(page: Option<usize>, per_page: Option<usize>) -> (Status, Value) {
+pub async fn get_users_list(page: Option<u16>, per_page: Option<u16>) -> (Status, Value) {
     let page = page.unwrap_or(1);
     let per_page = per_page.unwrap_or(1000);
 
     match DB
         .lock()
         .await
-        .query_table_platform_steam_users_list(page, per_page)
+        .query_table_platform_steam_users_list(page as usize, per_page as usize)
         .await
     {
         Ok(result) => (Status::Ok, json!(result)),

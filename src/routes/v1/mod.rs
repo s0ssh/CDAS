@@ -1,4 +1,5 @@
 pub mod platforms;
+pub mod divine;
 
 use rocket::http::Status;
 

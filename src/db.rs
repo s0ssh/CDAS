@@ -1,6 +1,6 @@
 use sqlx::{
-    postgres::{PgPoolOptions, PgQueryResult},
-    PgPool, Row,
+    postgres::PgPoolOptions,
+    PgPool
 };
 use std::env;
 use std::error::Error;

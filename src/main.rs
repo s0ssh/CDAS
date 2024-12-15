@@ -28,4 +28,7 @@ async fn rocket() -> _ {
             "/v1/platforms/",
             routes![routes::v1::platforms::list::get_list],
         )
+        .mount("/v1/divine/",
+            routes![routes::v1::divine::wisdom::get_wisdom],
+        )
 }

@@ -6,7 +6,7 @@ use std::io::prelude::*;
 use std::io::Write;
 use std::fs::File;
 
-const STATE_SIZE: u16 = 2;
+const STATE_SIZE: u16 = 3;
 const MAX_WORDS: u16 = 2;
 const MIN_WORDS: u16 = 0;
 
@@ -60,7 +60,6 @@ fn gen_markov_model(text: &str, state_size: usize) -> HashMap<String, Vec<&str>>
     model
 }
 
-/* this is an evil, unholy function. a TODO doesn't even come close */
 fn gen_markov_text(model: &HashMap<String, Vec<&str>>, state_size: usize, min_words: usize, max_words: usize) -> String {
     let mut msg_raw = Vec::new();
 
@@ -81,7 +80,6 @@ fn gen_markov_text(model: &HashMap<String, Vec<&str>>, state_size: usize, min_wo
         i += 1;
 
         if i > min_words && i >= max_words - 1 {
-            println!("Exiting at i = {}", i);
             break;
         }
     }

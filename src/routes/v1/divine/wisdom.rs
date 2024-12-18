@@ -8,13 +8,19 @@ use std::fs::File;
 
 const STATE_SIZE: u16 = 3;
 const MAX_WORDS_CAP: u16 = 1000;
+const MIN_WORDS_CAP: u16 = 20;
 const MIN_WORDS: u16 = 0;
 
 #[get("/wisdom?<max_words>")]
 pub async fn get_wisdom(max_words: Option<u16>) -> (Status, String) {
     let mut max_words = max_words.unwrap_or(100);
+
     if max_words > MAX_WORDS_CAP {
         max_words = MAX_WORDS_CAP;
+    }
+
+    if max_words < MIN_WORDS_CAP {
+        max_words = MIN_WORDS_CAP;
     }
 
     match File::open("data/bible.model") {

@@ -7,19 +7,23 @@ use std::io::Write;
 use std::fs::File;
 
 const STATE_SIZE: u16 = 3;
-const MAX_WORDS: u16 = 2;
+const MAX_WORDS_CAP: u16 = 1000;
 const MIN_WORDS: u16 = 0;
 
-#[get("/wisdom")]
-pub async fn get_wisdom() -> (Status, String) {
-    // caching is for broke people who can't afford compute LOL
+#[get("/wisdom?<max_words>")]
+pub async fn get_wisdom(max_words: Option<u16>) -> (Status, String) {
+    let mut max_words = max_words.unwrap_or(100);
+    if max_words > MAX_WORDS_CAP {
+        max_words = MAX_WORDS_CAP;
+    }
+
     match File::open("data/bible.model") {
         Ok(mut f) => {
             let mut model_raw: Vec<u8> = Vec::new();
             f.read_to_end(&mut model_raw).unwrap();
             let model: HashMap<String, Vec<&str>> = bincode::deserialize(&model_raw).unwrap();
 
-            (Status::Ok, gen_markov_text(&model, STATE_SIZE.into(), MIN_WORDS.into(), MAX_WORDS.into()))
+            (Status::Ok, gen_markov_text(&model, STATE_SIZE.into(), MIN_WORDS.into(), max_words.into()))
         }, 
         Err(_) => {
             let bible = match fs::read_to_string("data/bible.txt") {
@@ -83,7 +87,6 @@ fn gen_markov_text(model: &HashMap<String, Vec<&str>>, state_size: usize, min_wo
             break;
         }
     }
-    msg_raw.push(String::from("."));
 
 
     msg_raw.join(" ")
@@ -97,6 +100,7 @@ fn gen_markov_starter(model: &HashMap<String, Vec<&str>>) -> Vec<String> {
         // char
         if k.chars().nth(0).unwrap_or('a').is_uppercase() {
             starter.append(&mut k.split(' ').map(|s| s.to_string()).collect::<Vec<String>>());
+            break;
         }
     }
 

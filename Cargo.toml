@@ -5,13 +5,7 @@ edition = "2021"
 
 [dependencies]
 chrono = "0.4.38"
-dotenv = "0.15.0"
-jsonwebtoken = "9.3.0"
 serde = "1.0.215"
 rocket = { version = "0.5.1", features = ["json"] }
-sqlx = { version = "0.8", features = [ "runtime-tokio", "postgres", "macros" ] }
-dotenvy = "0.15.7"
-lazy_static = "1.5.0"
-tokio = "1.42.0"
 rand = "0.8.5"
 bincode = "1.3.3"

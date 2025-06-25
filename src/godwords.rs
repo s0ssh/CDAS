@@ -11,8 +11,8 @@ const MAX_WORDS_CAP: u16 = 800;
 const MIN_WORDS_CAP: u16 = 60;
 const MIN_WORDS: u16 = 0;
 
-#[get("/wisdom?<max_words>")]
-pub async fn get_wisdom(max_words: Option<u16>) -> (Status, String) {
+#[get("/god?<max_words>")]
+pub async fn get_godwords(max_words: Option<u16>) -> (Status, String) {
     let mut max_words = max_words.unwrap_or(80);
 
     if max_words > MAX_WORDS_CAP {

@@ -7,13 +7,13 @@ use std::io::Write;
 use std::fs::File;
 
 const STATE_SIZE: u16 = 3;
-const MAX_WORDS_CAP: u16 = 1000;
-const MIN_WORDS_CAP: u16 = 20;
+const MAX_WORDS_CAP: u16 = 800;
+const MIN_WORDS_CAP: u16 = 60;
 const MIN_WORDS: u16 = 0;
 
 #[get("/wisdom?<max_words>")]
 pub async fn get_wisdom(max_words: Option<u16>) -> (Status, String) {
-    let mut max_words = max_words.unwrap_or(100);
+    let mut max_words = max_words.unwrap_or(80);
 
     if max_words > MAX_WORDS_CAP {
         max_words = MAX_WORDS_CAP;
@@ -84,13 +84,13 @@ fn gen_markov_text(model: &HashMap<String, Vec<&str>>, state_size: usize, min_wo
             continue;
         }
 
-        let next_word = model.get(&key).unwrap().into_iter().choose(&mut rand::thread_rng()).unwrap();
-        msg_raw.push(next_word.to_string());
+        let next_word = model.get(&key).unwrap().into_iter().choose(&mut rand::thread_rng()).unwrap().to_string();
+        msg_raw.push(next_word.clone());
 
         i += 1;
 
-        if i > min_words && i >= max_words - 1 {
-            break;
+        if i > min_words && i >= max_words - 1 && next_word.chars().last() == Some('.') {
+            break
         }
     }
 
